@@ -1,0 +1,48 @@
+[project]
+name = "aimv"
+version = "0.1.0"
+description = "Beat-locked music video engine: song breakdown, painted-runner choreography and the MUTO stitched-photo look"
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Main Thread" }]
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "numpy",
+  "scipy",
+  "soundfile",
+  "soxr",
+  "librosa>=0.10",
+  "pyloudnorm",
+  "certifi",
+  "torch",
+  "torchaudio",
+  "audio-separator",
+  "audioread",
+  "beat_this @ https://github.com/CPJKU/beat_this/archive/main.zip",
+  "ctc-forced-aligner",
+  "openai-whisper",
+  "requests",
+  "pillow",
+  "opencv-python-headless>=4.10",
+  "pyyaml>=6",
+]
+
+[project.optional-dependencies]
+# Only for `aimv hf` and `aimv board` (paid image and video generation through Higgsfield).
+higgsfield = ["higgsfield-client"]
+
+[project.scripts]
+aimv = "aimv.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aimv"]
+
+[dependency-groups]
+dev = ["pytest"]

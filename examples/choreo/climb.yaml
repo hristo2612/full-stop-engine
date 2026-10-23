@@ -1,0 +1,40 @@
+# The climb from Full Stop (film-v8c, bars 64 to 75): one physics-driven parkour move at real speed. The sprint comes
+# in at 5.5 m/s, hops onto the market crates and off, over a skip at the kerb, a wall run up a scaffold tube, a hurdle,
+# a tic-tac off a drainpipe and a real-time climb up the facade into a crouch on the parapet on the lyric "Full stop"
+# (101.49 s). A WAIT stencil is painted on the wall earlier and smeared as he passes it.
+# Obstacle names (crates, tube2, pipeT ...) and the sequences (leap_AL, wallrun_WR ...) come from the film's street
+# and pose library, which are not part of this repository: use it as a reference for the format.
+street: v8c
+seed: 41
+jump: J2
+primer: ghosts
+foot_lock: true
+vary: true
+ink: 0.8
+pause: false
+hits: {snare: 0.85}
+window: [86.0s, 102.2s]
+
+segments:
+  - {from: 64.1, to: 73.3, rate: 16ths, camera: {preset: spring}, label: the run, the wall run, the boards, the tic-tac}
+  - {from: 73.3, to: 75.3, rate: 16ths, camera: {preset: spring, zoom: 1.35}, label: the climb up the facade (wider)}
+
+moves:
+  - stencil: {id: wait, at: 62.1, text: WAIT, x: 30337, y: 770, h: 132, align: center, punch: 0,
+              smear: {at: 89.30s, length: 560, over: 5, rows: [740, 1190]}}
+  - parkour: {from: 64.1, from_x: 26501, v0: 5.5, gait: 5.0, to: 101.75s, trail_in: 1.0, wash: {from: 101.45s}, primer_clip: [null, null, 38717, null], route: [
+      {hop: {obstacle: crates, sequence: leap_AL, onto: true}},
+      {drop: {edge: crates.x1, sequence: leap_AL}},
+      {hop: {obstacle: p_skipT1, sequence: leap_AL, onto: true}},
+      {drop: {edge: 32373, sequence: leap_AL}},
+      {run: {gait: 4.8, x: 34077}},
+      {clip: {sequence: wallrun_WR, from: jump, obstacle: tube2, ground: T street, behind: [tube2, walkway]}},
+      {run: {gait: jog}},
+      {hop: {obstacle: p_siteT3, sequence: hurdle_VH, rise: 1.0}},
+      {run: {gait: jog}},
+      {clip: {sequence: tictac_TT, obstacle: pipeT, ground: walkway, behind: pipeT, to: stand}},
+      {clip: {sequence: facade_VFC, from: jump, x: {crouch: 38527}, at: 101.49s, key: crouch, ground: ledge, speed: 1, light_from: over}}]}
+  # (film) into P5's framing: P5's spring (soft_bounds) frames him lower in the 9:16 than the climb's facade framing
+  # does, so the 9:16 eases down over the last photos of the climb (a tilt) instead of jumping on the tear-off; the
+  # 16:9 is untouched
+  - hints: {frame: {from: 100.9s, to: 102.17s, dy_v: [0, 380], aspect: "9:16"}}

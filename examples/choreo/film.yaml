@@ -1,0 +1,7 @@
+# Format sketch (the part files are your own). A whole film is a list of parts rendered as one continuous shot: each included file holds the moves of its bars,
+# and the settings here (street, seed, window) apply to all of them.
+include: [intro, chorus1, climb]
+street: main
+seed: 21
+window: [0s, 180.0s]
+ink: 0.8

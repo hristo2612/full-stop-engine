@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__ breakdown</title>
+<style>
+:root {
+  --bg: #f6f5f2; --panel: #ffffff; --ink: #17171a; --muted: #6b6b73; --line: #e2e0da;
+  --grid: rgba(23,23,26,.08); --bar: rgba(23,23,26,.28); --wave: #8d8a84; --vox: #3a6df0;
+  --word: rgba(58,109,240,.14); --word-on: #3a6df0; --flag: #d9480f; --play: #e03131;
+  --kick: #17171a; --snare: #d9480f; --hat: #8d8a84; --impact: #e03131; --riser: rgba(224,49,49,.14);
+  --intro:#cfd8dc; --verse:#b2dfdb; --prechorus:#ffe0b2; --chorus:#f8bbd0; --postchorus:#e1bee7; --bridge:#c5cae9;
+  --break:#d7ccc8; --drop:#ffcdd2; --build:#fff9c4; --outro:#cfd8dc; --instrumental:#e0e0e0; --other:#eeeeee;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111114; --panel: #1a1a1f; --ink: #ececf1; --muted: #9a9aa5; --line: #2a2a31;
+    --grid: rgba(236,236,241,.07); --bar: rgba(236,236,241,.28); --wave: #6f6f78; --vox: #7c9cff;
+    --word: rgba(124,156,255,.16); --word-on: #7c9cff; --kick: #ececf1;
+    --intro:#37474f; --verse:#1f4d48; --prechorus:#5a4220; --chorus:#5a2438; --postchorus:#45284d; --bridge:#2e3460;
+    --break:#4a3f3a; --drop:#5c2a2a; --build:#57531f; --outro:#37474f; --instrumental:#333338; --other:#2a2a2e;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 ui-sans-serif, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1400px; margin: 0 auto; padding: 20px 16px 60px; }
+h1 { font-size: 20px; margin: 0 0 4px; }
+.sub { color: var(--muted); margin-bottom: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.chip { background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-variant-numeric: tabular-nums; }
+.qa { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--flag); border-radius: 6px; padding: 8px 12px; margin-bottom: 14px; }
+.qa li { margin: 2px 0; }
+.now { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; display: grid; grid-template-columns: 170px 1fr; gap: 16px; align-items: center; }
+.counter { font: 600 28px/1 ui-monospace, "SF Mono", Menlo, monospace; font-variant-numeric: tabular-nums; }
+.counter small { display: block; font: 12px/1.6 ui-sans-serif, sans-serif; color: var(--muted); }
+.pulse { display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: var(--line); margin-left: 8px; vertical-align: middle; transition: transform .05s; }
+.lyric { font-size: 22px; min-height: 34px; }
+.lyric span { color: var(--muted); }
+.lyric span.past { color: var(--ink); }
+.lyric span.on { color: var(--word-on); }
+.lyric span.flag { text-decoration: underline wavy var(--flag); }
+.section-now { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+.transport { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 8px; }
+button, select { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 5px 12px; cursor: pointer; }
+button.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); min-width: 84px; }
+label { color: var(--muted); display: inline-flex; gap: 6px; align-items: center; }
+.time { font: 13px ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; }
+canvas { display: block; width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; touch-action: none; }
+#overview { height: 44px; margin-bottom: 8px; cursor: pointer; }
+#main { height: 360px; cursor: crosshair; }
+.hint { color: var(--muted); font-size: 12px; margin: 6px 0 18px; }
+.lines { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+.lines h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.ln { display: grid; grid-template-columns: 92px 56px 1fr; gap: 10px; padding: 4px 14px; cursor: pointer; }
+.ln:hover { background: var(--grid); }
+.ln.cur { background: var(--word); }
+.ln .t, .ln .b { font: 12px ui-monospace, Menlo, monospace; color: var(--muted); padding-top: 2px; }
+.ln .x i { font-style: normal; text-decoration: underline wavy var(--flag); }
+.sechead { padding: 8px 14px 2px; font-weight: 600; }
+#tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--bg); padding: 4px 8px; border-radius: 4px; font: 12px ui-monospace, Menlo, monospace; display: none; white-space: pre; z-index: 10; }
+@media (max-width: 640px) { .now { grid-template-columns: 1fr; } .lyric { font-size: 18px; } .ln { grid-template-columns: 74px 1fr; } .ln .b { display: none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="title"></h1>
+  <div class="sub">Song breakdown: check the grid by eye and by ear before anything is placed on it. Bars are counted from 1 here (from 0 in the JSON).</div>
+  <div class="chips" id="chips"></div>
+  <ul class="qa" id="qa" hidden></ul>
+
+  <div class="now">
+    <div class="counter"><span id="bb">-.-</span><span class="pulse" id="pulse"></span><small id="clock">0:00.000</small></div>
+    <div><div class="section-now" id="secnow"></div><div class="lyric" id="lyric"></div></div>
+  </div>
+
+  <div class="transport">
+    <button class="primary" id="play">Play</button>
+    <label>Track <select id="track"><option value="mix">Mix</option><option value="check">Check (clicks + word ticks)</option></select></label>
+    <label>Zoom <input type="range" id="zoom" min="2" max="120" value="16"> <span id="zoomv" class="time"></span></label>
+    <label><input type="checkbox" id="follow" checked> Follow</label>
+    <span class="time" id="pos"></span>
+  </div>
+  <canvas id="overview"></canvas>
+  <canvas id="main"></canvas>
+  <div class="hint">Click to seek. Drag or scroll sideways to pan, ctrl/cmd + scroll to zoom. Space plays and pauses, arrow keys jump one bar. In the check track, beat clicks are in both ears (high click on the downbeat) and word starts tick in the right ear.</div>
+
+  <div class="lines" id="lines"><h2>Lines</h2></div>
+</main>
+<div id="tip"></div>
+<audio id="aud-mix" preload="auto"></audio>
+<audio id="aud-check" preload="auto"></audio>
+<script>
+const D = __DATA__;
+const $ = (id) => document.getElementById(id);
+const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt = (t) => { t = Math.max(0, t); const m = Math.floor(t / 60); return m + ":" + (t - m * 60).toFixed(3).padStart(6, "0"); };
+
+$("title").textContent = D.title;
+const s = D.song;
+const chips = [
+  ["Length", fmt(D.duration)],
+  ["Tempo", s.bpm_median ? s.bpm_median.toFixed(1) + " BPM" + (s.bpm_range ? " (" + s.bpm_range[0].toFixed(1) + " to " + s.bpm_range[1].toFixed(1) + ")" : "") : "n/a"],
+  ["Meter", s.meter ? s.meter + "/4" : "n/a"],
+  ["Bars", s.counts.bars],
+  ["Key", (s.key && s.key.local) || "n/a"],
+  ["Loudness", s.lufs_integrated != null ? s.lufs_integrated.toFixed(1) + " LUFS" : "n/a"],
+  ["Words", s.counts.words + (s.counts.words_flagged ? " (" + s.counts.words_flagged + " flagged)" : "")],
+];
+for (const [k, v] of chips) { const c = document.createElement("span"); c.className = "chip"; c.textContent = k + ": " + v; $("chips").appendChild(c); }
+if (s.qa && s.qa.length) { $("qa").hidden = false; for (const q of s.qa) { const li = document.createElement("li"); li.textContent = q; $("qa").appendChild(li); } }
+
+// ---------- audio ----------
+const auds = { mix: $("aud-mix"), check: $("aud-check") };
+auds.mix.src = D.audio.mix; auds.check.src = D.audio.check;
+let cur = auds.mix;
+const now = () => cur.currentTime || 0;
+function seek(t) { t = Math.min(Math.max(0, t), D.duration); for (const a of Object.values(auds)) { try { a.currentTime = t; } catch (e) {} } draw(); }
+$("play").onclick = () => { if (cur.paused) cur.play(); else cur.pause(); };
+for (const a of Object.values(auds)) { a.onplay = a.onpause = () => { $("play").textContent = cur.paused ? "Play" : "Pause"; }; }
+$("track").onchange = (e) => {
+  const t = now(), playing = !cur.paused; cur.pause();
+  cur = auds[e.target.value]; cur.currentTime = t; if (playing) cur.play();
+};
+
+// ---------- lookups ----------
+const beats = D.beats, words = D.words, bars = D.bars;
+function idxAt(arr, t, key) { let lo = 0, hi = arr.length - 1, r = -1; while (lo <= hi) { const m = (lo + hi) >> 1; if (arr[m][key] <= t) { r = m; lo = m + 1; } else hi = m - 1; } return r; }
+const secAt = (t) => D.sections.find((x) => t >= x.t0 && t < x.t1);
+const lineAt = (t) => { let best = null; for (const l of D.lines) { if (l.t0 == null) continue; if (t >= l.t0 - 0.15 && t <= l.t1 + 0.6) best = l; } return best; };
+
+// ---------- lines list ----------
+(function buildLines() {
+  const box = $("lines"); let lastSec = null;
+  for (const l of D.lines) {
+    if (l.section !== lastSec) { lastSec = l.section; const sec = D.sections.find((x) => x.lines && x.lines.includes(l.i)) || D.sections.find((x) => x.i === l.section); const h = document.createElement("div"); h.className = "sechead"; h.textContent = sec ? sec.label : "Section " + l.section; box.appendChild(h); }
+    const row = document.createElement("div"); row.className = "ln"; row.dataset.i = l.i;
+    const t = document.createElement("div"); t.className = "t"; t.textContent = l.t0 != null ? fmt(l.t0) : "not found";
+    const b = document.createElement("div"); b.className = "b"; b.textContent = l.bar0 != null ? "bar " + (l.bar0 + 1) : "";
+    const x = document.createElement("div"); x.className = "x";
+    for (const wi of l.words) { const w = words[wi]; if (!w) continue; const el = document.createElement(w.flag ? "i" : "span"); el.textContent = w.text + " "; if (w.flag) el.title = w.flag; x.appendChild(el); }
+    row.append(t, b, x); row.onclick = () => { if (l.t0 != null) seek(l.t0 - 0.3); }; box.appendChild(row);
+  }
+})();
+
+// ---------- canvas ----------
+const ov = $("overview"), mc = $("main"), tip = $("tip");
+let pxPerS = 16 * 8, viewT0 = 0;
+function fit(c) { const r = c.getBoundingClientRect(), d = devicePixelRatio || 1; c.width = Math.round(r.width * d); c.height = Math.round(r.height * d); const g = c.getContext("2d"); g.setTransform(d, 0, 0, d, 0, 0); return [g, r.width, r.height]; }
+const LANES = { sec: [0, 22], wave: [26, 92], vox: [122, 92], hits: [218, 64], tempo: [286, 60] };
+
+function drawOverview() {
+  const [g, W, H] = fit(ov); const k = W / D.duration;
+  for (const sct of D.sections) { g.fillStyle = css("--" + sct.kind) || css("--other"); g.fillRect(sct.t0 * k, 0, (sct.t1 - sct.t0) * k, H); }
+  g.fillStyle = css("--wave"); const pk = D.peaks.mix, step = pk.length / W;
+  for (let x = 0; x < W; x++) { let m = 0; for (let j = Math.floor(x * step); j < Math.floor((x + 1) * step); j++) m = Math.max(m, pk[j] || 0); g.fillRect(x, H / 2 - m * H * 0.42, 1, m * H * 0.84); }
+  const vw = mc.getBoundingClientRect().width / pxPerS;
+  g.strokeStyle = css("--ink"); g.lineWidth = 1.5; g.strokeRect(viewT0 * k, 1, vw * k, H - 2);
+  g.fillStyle = css("--play"); g.fillRect(now() * k - 1, 0, 2, H);
+}
+
+function drawMain() {
+  const [g, W, H] = fit(mc); const t0 = viewT0, t1 = t0 + W / pxPerS; const X = (t) => (t - t0) * pxPerS;
+  g.font = "11px ui-sans-serif, -apple-system, sans-serif"; g.textBaseline = "middle";
+  // sections
+  for (const sct of D.sections) { if (sct.t1 < t0 || sct.t0 > t1) continue; g.fillStyle = css("--" + sct.kind) || css("--other"); g.fillRect(X(sct.t0), LANES.sec[0], (sct.t1 - sct.t0) * pxPerS, LANES.sec[1]); g.fillStyle = css("--ink"); g.fillText(sct.label, Math.max(X(sct.t0), 0) + 6, LANES.sec[0] + 11); }
+  // risers behind everything
+  for (const r of (D.hits.riser || [])) { if (r.t1 < t0 || r.t0 > t1) continue; g.fillStyle = css("--riser"); g.fillRect(X(r.t0), LANES.wave[0], (r.t1 - r.t0) * pxPerS, H - LANES.wave[0]); }
+  // beat grid
+  for (const b of beats) { if (b.t < t0 || b.t > t1) continue; const x = X(b.t); const down = b.beat === 0; if (!down && pxPerS < 20) continue; g.fillStyle = down ? css("--bar") : css("--grid"); g.fillRect(x, LANES.wave[0], down ? 1.5 : 1, H - LANES.wave[0]); if (down && pxPerS > 30) { g.fillStyle = css("--muted"); g.fillText(String(b.bar + 1), x + 3, LANES.wave[0] + 8); } }
+  // waveforms
+  const wave = (pk, [y, h], col) => { g.fillStyle = col; const per = D.peaksPerS; for (let x = 0; x < W; x++) { const a = Math.floor((t0 + x / pxPerS) * per), e = Math.floor((t0 + (x + 1) / pxPerS) * per); let m = 0; for (let j = a; j <= Math.max(a, e - 1); j++) m = Math.max(m, pk[j] || 0); g.fillRect(x, y + h / 2 - m * h * 0.45, 1, Math.max(1, m * h * 0.9)); } };
+  wave(D.peaks.mix, LANES.wave, css("--wave"));
+  if (D.peaks.vocals.length) wave(D.peaks.vocals, LANES.vox, css("--vox"));
+  // gaps
+  g.fillStyle = css("--grid");
+  for (const gp of D.gaps || []) { if (gp.t1 < t0 || gp.t0 > t1) continue; g.fillRect(X(gp.t0), LANES.vox[0] + LANES.vox[1] - 6, (gp.t1 - gp.t0) * pxPerS, 6); }
+  // words
+  const T = now();
+  for (const w of words) {
+    if (w.t0 == null || w.t1 < t0 || w.t0 > t1) continue; const x = X(w.t0), ww = Math.max(2, (w.t1 - w.t0) * pxPerS);
+    const on = T >= w.t0 && T < w.t1; g.fillStyle = on ? css("--word-on") : css("--word"); g.globalAlpha = on ? 0.35 : 1; g.fillRect(x, LANES.vox[0], ww, LANES.vox[1] - 8); g.globalAlpha = 1;
+    g.fillStyle = w.flag ? css("--flag") : css("--word-on"); g.fillRect(x, LANES.vox[0], 1.5, LANES.vox[1] - 8);
+    if (pxPerS > 45) { g.save(); g.beginPath(); g.rect(x, LANES.vox[0], ww, 20); g.clip(); g.fillStyle = w.flag ? css("--flag") : css("--ink"); g.fillText(w.text, x + 3, LANES.vox[0] + 10); g.restore(); }
+  }
+  // hits: stops shade the lane, rolls run as bars along the kick/snare rows
+  const [hy, hh0] = LANES.hits;
+  for (const s of (D.hits.stop || [])) { if (s.t1 < t0 || s.t0 > t1) continue; g.globalAlpha = 0.08 + 0.12 * (s.s ?? 1); g.fillStyle = css("--ink"); g.fillRect(X(s.t0), hy, (s.t1 - s.t0) * pxPerS, hh0); g.globalAlpha = 1; if (pxPerS > 25) { g.fillStyle = css("--muted"); g.fillText("stop", X(s.t0) + 3, hy + hh0 - 5); } }
+  for (const r of (D.hits.roll || [])) { if (r.t1 < t0 || r.t0 > t1) continue; const vs = r.voice === "kick+snare" ? [0, 1] : [r.voice === "snare" ? 1 : 0];
+    for (const ri of vs) { g.globalAlpha = 0.35; g.fillStyle = css(ri ? "--snare" : "--kick"); g.fillRect(X(r.t0), hy + ri * 12 + 9, (r.t1 - r.t0) * pxPerS, 3); g.globalAlpha = 1; } }
+  const rows = [["kick", "--kick"], ["snare", "--snare"], ["hat", "--hat"], ["impact", "--impact"], ["vocal_entry", "--vox"]];
+  rows.forEach(([k, col], ri) => { const y = LANES.hits[0] + ri * 12 + 6; g.fillStyle = css("--muted"); if (pxPerS > 25) g.fillText(k, 4, y); g.fillStyle = css(col); for (const e of (D.hits[k] || [])) { if (e.t < t0 || e.t > t1) continue; const hh = 3 + 7 * (e.s ?? 1); g.fillRect(X(e.t) - 1, y - hh / 2, k === "impact" ? 3 : 2, hh); } });
+  // tempo curve
+  if (D.tempo.length > 1) { const bp = D.tempo.map((p) => p.bpm), lo = Math.min(...bp) - 0.5, hi = Math.max(...bp) + 0.5, [y, h] = LANES.tempo;
+    g.strokeStyle = css("--muted"); g.lineWidth = 1.2; g.beginPath(); D.tempo.forEach((p, i) => { const yy = y + h - ((p.bpm - lo) / (hi - lo)) * h; i ? g.lineTo(X(p.t), yy) : g.moveTo(X(p.t), yy); }); g.stroke();
+    g.fillStyle = css("--muted"); g.fillText("tempo " + lo.toFixed(1) + " to " + hi.toFixed(1) + " BPM", 4, y + 8); }
+  // playhead
+  g.fillStyle = css("--play"); g.fillRect(X(T) - 1, 0, 2, H);
+}
+
+function updateNow() {
+  const T = now(); $("clock").textContent = fmt(T); $("pos").textContent = fmt(T) + " / " + fmt(D.duration);
+  const bi = idxAt(beats, T, "t"); const b = beats[bi];
+  $("bb").textContent = b ? (b.bar < 0 ? "pickup" : (b.bar + 1) + "." + (b.beat + 1)) : "-.-";
+  const since = b ? T - b.t : 1; const p = $("pulse"); const hot = since < 0.09;
+  p.style.background = hot ? (b.beat === 0 ? css("--play") : css("--ink")) : css("--line"); p.style.transform = hot && b.beat === 0 ? "scale(1.35)" : "scale(1)";
+  const sec = secAt(T); $("secnow").textContent = sec ? sec.label + (sec.tag && sec.tag !== sec.label ? "  ·  " + sec.tag : "") : "";
+  const l = lineAt(T); const box = $("lyric");
+  if (!l) { box.textContent = ""; box.dataset.l = ""; } else {
+    if (box.dataset.l !== String(l.i)) { box.innerHTML = ""; box.dataset.l = l.i; for (const wi of l.words) { const w = words[wi]; if (!w) continue; const sp = document.createElement("span"); sp.textContent = w.text + " "; if (w.flag) sp.classList.add("flag"); sp.dataset.i = wi; box.appendChild(sp); } }
+    for (const sp of box.children) { const w = words[sp.dataset.i]; sp.classList.toggle("past", w.t0 != null && T >= w.t1); sp.classList.toggle("on", w.t0 != null && T >= w.t0 && T < w.t1); }
+  }
+  document.querySelectorAll(".ln.cur").forEach((e) => e.classList.remove("cur"));
+  if (l) { const row = document.querySelector('.ln[data-i="' + l.i + '"]'); if (row) row.classList.add("cur"); }
+}
+
+function draw() {
+  const W = mc.getBoundingClientRect().width, span = W / pxPerS;
+  if ($("follow").checked && !cur.paused) { const T = now(); if (T > viewT0 + span * 0.8 || T < viewT0) viewT0 = Math.max(0, T - span * 0.2); }
+  viewT0 = Math.min(Math.max(0, viewT0), Math.max(0, D.duration - span));
+  drawOverview(); drawMain(); updateNow();
+}
+function loop() { draw(); requestAnimationFrame(loop); }
+
+// ---------- interaction ----------
+function setZoom(v) { const W = mc.getBoundingClientRect().width, c = viewT0 + W / pxPerS / 2; pxPerS = v * 8; $("zoom").value = v; $("zoomv").textContent = Math.round(pxPerS) + " px/s"; viewT0 = c - W / pxPerS / 2; }
+$("zoom").oninput = (e) => setZoom(+e.target.value); setZoom(16);
+ov.onclick = (e) => { const r = ov.getBoundingClientRect(); const t = (e.clientX - r.left) / r.width * D.duration; seek(t); viewT0 = t - mc.getBoundingClientRect().width / pxPerS / 2; };
+let drag = null;
+mc.onpointerdown = (e) => { drag = { x: e.clientX, v: viewT0, moved: false }; mc.setPointerCapture(e.pointerId); };
+mc.onpointermove = (e) => {
+  const r = mc.getBoundingClientRect(), t = viewT0 + (e.clientX - r.left) / pxPerS;
+  if (drag) { const dx = e.clientX - drag.x; if (Math.abs(dx) > 3) drag.moved = true; viewT0 = drag.v - dx / pxPerS; }
+  const bi = idxAt(beats, t, "t"), b = beats[bi]; const wi = idxAt(words, t, "t0"); const w = words[wi] && t <= words[wi].t1 + 0.05 ? words[wi] : null;
+  tip.style.display = "block"; tip.style.left = e.clientX + 12 + "px"; tip.style.top = e.clientY + 12 + "px";
+  tip.textContent = fmt(t) + (b ? "\nbar " + (b.bar + 1) + " beat " + (b.beat + 1) + "  " + b.bpm.toFixed(2) + " BPM" : "") + (w ? '\n"' + w.text + '" ' + w.t0.toFixed(3) + " to " + w.t1.toFixed(3) + (w.conf != null ? "  conf " + w.conf.toFixed(2) : "") + (w.flag ? "  " + w.flag : "") : "");
+};
+mc.onpointerup = (e) => { if (drag && !drag.moved) { const r = mc.getBoundingClientRect(); seek(viewT0 + (e.clientX - r.left) / pxPerS); } drag = null; };
+mc.onpointerleave = () => { tip.style.display = "none"; };
+mc.addEventListener("wheel", (e) => { e.preventDefault(); if (e.ctrlKey || e.metaKey) { setZoom(Math.min(120, Math.max(2, +$("zoom").value * (e.deltaY < 0 ? 1.15 : 0.87)))); } else { viewT0 += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) / pxPerS; } }, { passive: false });
+document.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+  if (e.code === "Space") { e.preventDefault(); $("play").click(); }
+  if (e.code === "ArrowRight" || e.code === "ArrowLeft") { const T = now(); const bi = idxAt(bars, T, "t0"); const nb = bars[Math.min(bars.length - 1, Math.max(0, bi + (e.code === "ArrowRight" ? 1 : (T - (bars[bi] || { t0: 0 }).t0 > 0.3 ? 0 : -1))))]; if (nb) seek(nb.t0); }
+});
+addEventListener("resize", draw);
+loop();
+</script>
+</body>
+</html>

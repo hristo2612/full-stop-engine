@@ -1,0 +1,21 @@
+# A motion test: two bars of run, a vault over the utility cabinet with the hands planted on a snare, then one and a
+# half bars of run. Bars 45 to 48 of the song, a photo per 16th, the camera following.
+# Needs: a street called "main" with an obstacle "utility" (paint/streets/main/), and a pose library with a run
+# cycle and a vault sequence (paint/poses/).
+
+street: main
+seed: 31
+jump: J2
+primer: ghosts
+motion: m0
+ink: 0.8
+hits: {snare: 0.85}
+window: [60.34s, 65.9s]
+
+segments:
+  - {from: 45.1, to: 49.1, rate: 16ths, camera: {preset: follow, snap: true}, label: run, vault, run}
+
+moves:
+  - run: {from: 45.1}
+  - vault: {obstacle: utility, plant_on: snare@47.2}
+  - run: {to: 48.4.4}

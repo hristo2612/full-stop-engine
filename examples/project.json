@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "title": "Full Stop",
+  "slug": "full-stop",
+  "fps": 24,
+  "hits": {"vocal_gap_bars": 0.65},
+  "budget": {"cap_usd": 25, "phases": {"look": 10}}
+}

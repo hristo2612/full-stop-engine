@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Models and caches
+.models/
+.cache/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Projects, renders and ledgers (your songs, plates, pose libraries and outputs stay local)
+projects/
+*.jsonl
+
+# Media
+*.wav
+*.mp3
+*.m4a
+*.flac
+*.aif
+*.aiff
+*.ogg
+*.mp4
+*.mov
+*.m4v
+*.webm
+*.mkv
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.tif
+*.tiff
+*.psd
+*.npz
+*.npy
+
+# OS
+.DS_Store
